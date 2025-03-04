@@ -19,6 +19,9 @@ jobs:
           mv .Rprofile .Rprofile.bak
         fi
 
+    - name: Install dep
+      run: sudo apt-get -y install libcurl4-openssl-dev
+
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
 
