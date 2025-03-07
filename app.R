@@ -43,11 +43,15 @@ server <- function(input, output) {
     p <- ggplot(plot_data, aes(x = charge, y = speed)) +
       geom_point() +
       labs(x = "Charge (kg)", y = "Speed (m/s)", title = "Load-velocity Model") +
-      theme_minimal()
+      theme(plot.title = element_text(hjust = 0.5))  # Center the plot title
     
     if(nrow(plot_data) > 1) {
       fit <- lm(speed ~ charge, data = plot_data)
       p <- p + geom_smooth(method = "lm", col = "blue", se = FALSE, formula = 'y ~ x')
+      
+      # Add the regression equation to the plot
+      eq <- paste0("y = ", round(coef(fit)[1], 4), " + ", round(coef(fit)[2], 4), "x")
+      p <- p + annotate("text", x = mean(plot_data$charge), y = max(plot_data$speed), label = eq, size = 4, color = "blue")
     }
     
     ggplotly(p)
