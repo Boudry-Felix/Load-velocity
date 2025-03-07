@@ -1,4 +1,6 @@
 library(shiny)
+library(ggplot2)
+library(plotly)
 
 # Define UI for application that draws a Load-velocity plot
 ui <- fluidPage(
@@ -16,7 +18,7 @@ ui <- fluidPage(
 
     # Show a plot of the generated model
     mainPanel(
-      plotOutput("lvPlot")
+      plotlyOutput("lvPlot")
     )
   )
 )
@@ -36,20 +38,19 @@ server <- function(input, output) {
     data(data.frame(speed = numeric(0), charge = numeric(0)))
   })
   
-  output$lvPlot <- renderPlot({
+  output$lvPlot <- renderPlotly({
     plot_data <- data()
-    plot(plot_data$charge, plot_data$speed, 
-         xlab = "Charge (kg)", ylab = "Speed (m/s)", 
-         main = "Load-velocity Model", pch = 19)
+    p <- ggplot(plot_data, aes(x = charge, y = speed)) +
+      geom_point() +
+      labs(x = "Charge (kg)", y = "Speed (m/s)", title = "Load-velocity Model") +
+      theme_minimal()
+    
     if(nrow(plot_data) > 1) {
-      # Add regression line
       fit <- lm(speed ~ charge, data = plot_data)
-      abline(fit, col = "blue")
-      
-      # Optionally, add the regression equation to the plot
-      eq <- paste0("y = ", round(coef(fit)[1], 2), " + ", round(coef(fit)[2], 2), "x")
-      legend("topleft", legend = eq, bty = "n")
+      p <- p + geom_smooth(method = "lm", col = "blue", se = FALSE, formula = 'y ~ x')
     }
+    
+    ggplotly(p)
   })
 }
 
