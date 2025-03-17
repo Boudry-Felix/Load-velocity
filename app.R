@@ -4,8 +4,11 @@ library(plotly)
 
 # Define UI for application that draws a Load-velocity plot
 ui <- fluidPage(
-  # Application title
-  titlePanel("Load-velocity Model"),
+  # Header
+  tags$header(
+    tags$h1("Load-velocity Model App"),
+    tags$p("This app allows you to visualize the Load-velocity model by adding speed and charge values.")
+  ),
 
   # Sidebar with input fields for speed and charge
   sidebarLayout(
@@ -37,6 +40,15 @@ ui <- fluidPage(
           verbatimTextOutput("maxPower")
         )
       )
+    )
+  ),
+
+  # Footer
+  tags$footer(
+    tags$p(
+      "For more information, visit the ",
+      tags$a(href = "https://github.com/Boudry-Felix/Load-velocity", "GitHub repository"), " or report issues ",
+      tags$a(href = "https://github.com/Boudry-Felix/Load-velocity/issues", "here"), "."
     )
   )
 )
@@ -122,8 +134,8 @@ server <- function(input, output) {
         fit2 <- lm(force ~ speed, data = plot_data)
         fit3 <- lm(power ~ poly(speed, 2), data = plot_data)
 
-        p <- p + geom_smooth(aes(x = speed, y = charge, color = "Charge"), method = "lm", se = FALSE) +
-          geom_smooth(aes(x = speed, y = force, color = "Force"), method = "lm", se = FALSE) +
+        p <- p + geom_smooth(aes(x = speed, y = charge, color = "Charge"), method = "lm", se = FALSE, formula = "y ~ x") +
+          geom_smooth(aes(x = speed, y = force, color = "Force"), method = "lm", se = FALSE, formula = "y ~ x") +
           geom_smooth(aes(x = speed, y = power, color = "Power"), method = "lm", formula = y ~ poly(x, 2), se = FALSE)
 
         # Add regression equations to the legend
